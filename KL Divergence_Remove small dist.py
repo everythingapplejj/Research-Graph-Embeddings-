@@ -37,14 +37,14 @@ def extract_and_calculate_bins(row):
         representative_bins.append(representative_bin)
     return representative_bins
 
-# calculate pairwise-diff within every piece of data
+# calculate pairwise-diff within every piece of data (each row)
 def calculate_pairwise_diff(representative_bins):
     pairwise_diffs = []
     for (bin1, bin2) in combinations(representative_bins, 2):
         pairwise_diffs.append(abs(bin1 - bin2))
     return filter_pairwise_diff(pairwise_diffs)
 
-# Iterate every piece of data (row) to get all pairwise diff; store them by chromosome type
+# Iterate every piece of data (row) to get all pairwise diff; store them by chromosome type (chr2L, chr2R ...)
 chromosome_diffs = {}
 for index, row in tqdm(df_pass.iterrows(), total=df_pass.shape[0], desc="Processing Rows"):
     representative_bins = extract_and_calculate_bins(row)
