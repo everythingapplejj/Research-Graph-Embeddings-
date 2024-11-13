@@ -13,14 +13,27 @@ data_path = "../GSM3347525NR_FDR_0.1_pseudoGEM_10000_enrichTest_master.txt"  # R
 df = pd.read_csv(data_path, sep="\t")
 df = df[df['decis1'] == 'PASS'].copy()
 
+# chromosome lengths in Mb
+chromosome_lengths = {
+    'chr2L': 23.5,
+    'chr2R': 25.3,
+    'chr3L': 28.1,
+    'chr3R': 32.1,
+    'chrX': 23.5,
+    'chr4': 1.3,
+    'chrY': 3.7
+}
+
 # Function to compute midpoint bin and pairwise differences within a row
-def compute_midpoints_and_diffs(row):
+def compute_midpoints_git_and_diffs(row):
     fragments = row['List_of_frag_coord'].split(';')
     midpoints = []
+    chrom = row['GEM_coord'].split(':')[0]  # get chrom name
+    chrom_len = chromosome_lengths[chrom]
     for fragment in fragments:
         start, end = map(int, fragment.split(':')[1].split('-'))
-        start_bin = (start // 500) + 1
-        end_bin = (end // 500) + 1
+        start_bin = ((start / chrom_len) // 500) + 1
+        end_bin = ((end / chrom_len) // 500) + 1
         midpoint = (start_bin + end_bin) // 2  # Calculate the midpoint
         midpoints.append(midpoint)
 
@@ -47,7 +60,7 @@ for chrom in df['GEM_coord'].str.split(':').str[0].unique():
 
 print(len(chromosome_diffs['chr2L']))
 # Function to truncate and normalize PMF for each chromosome
-def truncate_and_normalize(diffs, left_threshold=1500):
+def truncate_and_normalize(diffs, left_threshold=100):
     # Truncate the left side
     truncated_diffs = [d for d in diffs if d >= left_threshold]
     # data_range = max(truncated_diffs) - min(truncated_diffs)
@@ -76,7 +89,7 @@ for chrom, diffs in chromosome_diffs.items():
     if len(diffs) > 0:
         pmf, right_threshold = truncate_and_normalize(diffs)
         chromosome_histograms[chrom] = pmf
-        print(f"{chrom}: PMF calculated with left threshold 1500 and right threshold {right_threshold}")
+        print(f"{chrom}: PMF calculated with left threshold 100 and right threshold {right_threshold}")
 
 # Calculate symmetric KL Divergence
 kl_divergences = {}
