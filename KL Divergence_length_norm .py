@@ -25,7 +25,7 @@ chromosome_lengths = {
 }
 
 # Function to compute midpoint bin and pairwise differences within a row
-def compute_midpoints_git_and_diffs(row):
+def compute_midpoints_and_diffs(row):
     fragments = row['List_of_frag_coord'].split(';')
     midpoints = []
     chrom = row['GEM_coord'].split(':')[0]  # get chrom name
